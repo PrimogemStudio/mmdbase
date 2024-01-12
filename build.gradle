@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'maven-publish'
     id 'signing'
+    id 'org.jetbrains.dokka' version '1.9.10'
 }
 
 group = 'io.github.primogemstudio'
@@ -37,8 +38,14 @@ task sourcesJar(type: Jar) {
     archiveClassifier = "sources"
 }
 
+task javadocJar(type: Jar) {
+    dependsOn(javadoc)
+    from("build/dokka/javadoc")
+    archiveClassifier = "javadoc"
+}
+
 artifacts {
-    archives sourcesJar
+    archives sourcesJar, javadocJar
 }
 
 publishing {
@@ -50,11 +57,12 @@ publishing {
 
             from components.kotlin
             artifact sourcesJar
+            artifact javadocJar
 
             pom {
                 name = 'MMD Base'
                 description = 'An independent module from Advanced-Framework mod, be used to praise and load MMD models'
-                url = 'http://github.com/Primogem-Craft-Development/mmdbase'
+                url = 'http://github.com/PrimogemStudio/mmdbase'
                 licenses {
                     license {
                         name = 'GNU GENERAL PUBLIC LICENSE Version 3'
@@ -75,9 +83,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/Primogem-Craft-Development/mmdbase.git'
-                    developerConnection = 'scm:git:ssh://github.com/Primogem-Craft-Development/mmdbase.git'
-                    url = 'https://github.com/Primogem-Craft-Development/mmdbase'
+                    connection = 'scm:git:git://github.com/PrimogemStudio/mmdbase.git'
+                    developerConnection = 'scm:git:ssh://github.com/PrimogemStudio/mmdbase.git'
+                    url = 'https://github.com/PrimogemStudio/mmdbase'
                 }
             }
         }
