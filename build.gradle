@@ -1,0 +1,107 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
+    id 'application'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'io.github.primogemstudio'
+version = '0.0.1-alpha2'
+
+repositories {
+    maven { url = 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url = 'https://maven.aliyun.com/repository/google' }
+    maven { url = 'https://maven.aliyun.com/repository/public' }
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    implementation "org.joml:joml:1.10.5"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+application {
+    mainClassName = 'MainKt'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier = "sources"
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = 'mmdbase'
+            version = version
+
+            from components.kotlin
+            artifact sourcesJar
+
+            pom {
+                name = 'MMD Base'
+                description = 'An independent module from Advanced-Framework mod, be used to praise and load MMD models'
+                url = 'http://github.com/Primogem-Craft-Development/mmdbase'
+                licenses {
+                    license {
+                        name = 'GNU GENERAL PUBLIC LICENSE Version 3'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'hackermdch'
+                        name = 'hackermdch'
+                    }
+
+
+                    developer {
+                        id = 'Jack253-png'
+                        name = 'Coder 2'
+                        email = 'guoxiuchen20170402@163.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Primogem-Craft-Development/mmdbase.git'
+                    developerConnection = 'scm:git:ssh://github.com/Primogem-Craft-Development/mmdbase.git'
+                    url = 'https://github.com/Primogem-Craft-Development/mmdbase'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "LocalMaven"
+            url = layout.projectDirectory.dir("../maven")
+        }
+
+        maven {
+            name = "MavenCentral"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUserName
+                password = ossrhPassword
+            }
+            url = snapshotsRepoUrl
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
+}

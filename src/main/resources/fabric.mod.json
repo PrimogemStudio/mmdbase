@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "mmdbase",
+  "version": "0.0.1-alpha2",
+  "name": "MMD Base (MMD Loader)",
+  "description": "An independent module from Advanced-Framework mod, be used to praise and load MMD models",
+  "authors": [
+    "Jack253-png",
+    "hackermdch"
+  ],
+  "contact": {
+    "repo": "https://github.com/Primogem-Craft-Development/mmdbase",
+    "sources": "https://github.com/Primogem-Craft-Development/mmdbase",
+    "issues": "https://github.com/Primogem-Craft-Development/mmdbase/issues"
+  },
+  "license": "GPLv3",
+  "icon": "assets/mmdbase/icon.png",
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ],
+      "parent": "advancedfmk"
+    }
+  }
+}
