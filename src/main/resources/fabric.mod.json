@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "mmdbase",
-  "version": "0.0.1-alpha2",
+  "version": "0.0.1-alpha3",
   "name": "MMD Base (MMD Loader)",
   "description": "An independent module from Advanced-Framework mod, be used to praise and load MMD models",
   "authors": [
