@@ -25,6 +25,14 @@ class PMXBone {
     var m_ikIterationCount = 0
     var m_ikLimit = 0f
     var m_ikLinks = emptyArray<PMXIKLink>()
+
+    class PMXIKLink {
+        var m_ikBoneIndex = 0
+        var m_enableLimit: Byte = 0
+
+        var m_limitMin = Vector3f()
+        var m_limitMax = Vector3f()
+    }
 }
 
 enum class PMXBoneFlags(val flag: Int) {
@@ -43,33 +51,25 @@ enum class PMXBoneFlags(val flag: Int) {
     DeformOuterParent(0x2000);
 }
 
-class PMXIKLink {
-    var m_ikBoneIndex = 0
-    var m_enableLimit: Byte = 0
-
-    var m_limitMin = Vector3f()
-    var m_limitMax = Vector3f()
-}
-
 class PMXDisplayFrame {
     var m_name = ""
     var m_englishName = ""
     var m_flag = FrameType.DefaultFrame
     var m_targets = emptyArray<Target>()
-}
 
-enum class FrameType {
-    DefaultFrame,
-    SpecialFrame,
-}
+    enum class FrameType {
+        DefaultFrame,
+        SpecialFrame,
+    }
 
-enum class TargetType {
-    BoneIndex,
-    MorphIndex,
-}
-class Target {
-    var m_type = TargetType.BoneIndex
-    var m_index = 0
+    class Target {
+        var m_type = TargetType.BoneIndex
+        var m_index = 0
+        enum class TargetType {
+            BoneIndex,
+            MorphIndex,
+        }
+    }
 }
 
 class PMXFace {
@@ -90,15 +90,15 @@ class PMXJoint {
     var m_rotateUpperLimit = Vector3f()
     var m_springTranslateFactor = Vector3f()
     var m_springRotateFactor = Vector3f()
-}
 
-enum class JointType {
-    SpringDOF6,
-    DOF6,
-    P2P,
-    ConeTwist,
-    Slider,
-    Hinge,
+    enum class JointType {
+        SpringDOF6,
+        DOF6,
+        P2P,
+        ConeTwist,
+        Slider,
+        Hinge,
+    }
 }
 
 class PMXMaterial {
@@ -118,42 +118,42 @@ class PMXMaterial {
     var m_toonTextureIndex = 0
     var m_memo = ""
     var m_numFaceVertices = 0
-}
 
-enum class PMXToonMode {
-    Separate,
-    Common,
-}
+    enum class PMXToonMode {
+        Separate,
+        Common,
+    }
 
-enum class PMXSphereMode {
-    None,
-    Mul,
-    Add,
-    SubTexture,
-}
+    enum class PMXSphereMode {
+        None,
+        Mul,
+        Add,
+        SubTexture,
+    }
 
-enum class PMXDrawModeFlags {
-    BothFace,
-    GroundShadow,
-    CastSelfShadow,
-    RecieveSelfShadow,
-    DrawEdge,
-    VertexColor,
-    DrawPoint,
-    DrawLine;
-    companion object {
-        @JvmStatic
-        fun findMode(a: Byte): PMXDrawModeFlags {
-            return when (a.toInt()) {
-                0x01 -> BothFace
-                0x02 -> GroundShadow
-                0x04 -> CastSelfShadow
-                0x08 -> RecieveSelfShadow
-                0x10 -> DrawEdge
-                0x20 -> VertexColor
-                0x40 -> DrawPoint
-                0x80 -> DrawLine
-                else -> BothFace
+    enum class PMXDrawModeFlags {
+        BothFace,
+        GroundShadow,
+        CastSelfShadow,
+        RecieveSelfShadow,
+        DrawEdge,
+        VertexColor,
+        DrawPoint,
+        DrawLine;
+        companion object {
+            @JvmStatic
+            fun findMode(a: Byte): PMXDrawModeFlags {
+                return when (a.toInt()) {
+                    0x01 -> BothFace
+                    0x02 -> GroundShadow
+                    0x04 -> CastSelfShadow
+                    0x08 -> RecieveSelfShadow
+                    0x10 -> DrawEdge
+                    0x20 -> VertexColor
+                    0x40 -> DrawPoint
+                    0x80 -> DrawLine
+                    else -> BothFace
+                }
             }
         }
     }
@@ -171,72 +171,72 @@ class PMXMorph {
     var m_groupMorph = emptyArray<GroupMorph>()
     var m_flipMorph = emptyArray<FlipMorph>()
     var m_impulseMorph = emptyArray<ImpulseMorph>()
-}
 
-enum class PMXMorphType {
-    Group,
-    Position,
-    Bone,
-    UV,
-    AddUV1,
-    AddUV2,
-    AddUV3,
-    AddUV4,
-    Material,
-    Flip,
-    Impluse
-}
-
-class PositionMorph {
-    var m_vertexIndex = 0
-    var m_position = Vector3f()
-}
-
-class UVMorph {
-    var m_vertexIndex = 0
-    var m_uv = Vector4f()
-}
-
-class BoneMorph {
-    var m_boneIndex = 0
-    var m_position = Vector3f()
-    var m_quaternion = Quaternionf()
-}
-
-class MaterialMorph {
-    enum class OpType {
-        Mul,
-        Add,
+    enum class PMXMorphType {
+        Group,
+        Position,
+        Bone,
+        UV,
+        AddUV1,
+        AddUV2,
+        AddUV3,
+        AddUV4,
+        Material,
+        Flip,
+        Impluse
     }
 
-    var m_materialIndex = 0
-    var m_opType = OpType.Mul
-    var m_diffuse = Vector4f()
-    var m_specular = Vector3f()
-    var m_specularPower = 0f
-    var m_ambient = Vector3f()
-    var m_edgeColor = Vector4f()
-    var m_edgeSize = 0f
-    var m_textureFactor = Vector4f()
-    var m_sphereTextureFactor = Vector4f()
-    var m_toonTextureFactor = Vector4f()
-}
+    class PositionMorph {
+        var m_vertexIndex = 0
+        var m_position = Vector3f()
+    }
 
-class GroupMorph {
-    var	m_morphIndex = 0
-    var m_weight = 0f
-}
+    class UVMorph {
+        var m_vertexIndex = 0
+        var m_uv = Vector4f()
+    }
 
-class FlipMorph {
-    var	m_morphIndex = 0
-    var m_weight = 0f
-}
+    class BoneMorph {
+        var m_boneIndex = 0
+        var m_position = Vector3f()
+        var m_quaternion = Quaternionf()
+    }
 
-class ImpulseMorph {
-    var m_rigidbodyIndex = 0
-    var m_localFlag: Byte = 0	//0:OFF 1:ON
-    var m_translateVelocity = Vector3f()
-    var m_rotateTorque = Vector3f()
+    class MaterialMorph {
+        enum class OpType {
+            Mul,
+            Add,
+        }
+
+        var m_materialIndex = 0
+        var m_opType = OpType.Mul
+        var m_diffuse = Vector4f()
+        var m_specular = Vector3f()
+        var m_specularPower = 0f
+        var m_ambient = Vector3f()
+        var m_edgeColor = Vector4f()
+        var m_edgeSize = 0f
+        var m_textureFactor = Vector4f()
+        var m_sphereTextureFactor = Vector4f()
+        var m_toonTextureFactor = Vector4f()
+    }
+
+    class GroupMorph {
+        var	m_morphIndex = 0
+        var m_weight = 0f
+    }
+
+    class FlipMorph {
+        var	m_morphIndex = 0
+        var m_weight = 0f
+    }
+
+    class ImpulseMorph {
+        var m_rigidbodyIndex = 0
+        var m_localFlag: Byte = 0	//0:OFF 1:ON
+        var m_translateVelocity = Vector3f()
+        var m_rotateTorque = Vector3f()
+    }
 }
 
 class PMXRigidBody {
@@ -255,18 +255,18 @@ class PMXRigidBody {
     var m_repulsion = 0f
     var m_friction = 0f
     var m_op = Operation.Static
-}
 
-enum class Operation {
-    Static,
-    Dynamic,
-    DynamicAndBoneMerge
-}
+    enum class Operation {
+        Static,
+        Dynamic,
+        DynamicAndBoneMerge
+    }
 
-enum class Shape {
-    Sphere,
-    Box,
-    Capsule,
+    enum class Shape {
+        Sphere,
+        Box,
+        Capsule,
+    }
 }
 
 class PMXSoftBody {
@@ -312,45 +312,41 @@ class PMXSoftBody {
     var m_VST = 0f
     var m_anchorRigidBodies = emptyArray<AnchorRigidbody>()
     var m_pinVertexIndices = emptyArray<Int>()
-}
 
-enum class SoftbodyType {
-    TriMesh,
-    Rope,
-}
+    enum class SoftbodyType {
+        TriMesh,
+        Rope,
+    }
 
-enum class SoftbodyMask {
-    BLink,
-    Cluster,
-    HybridLink;
-    companion object {
-        @JvmStatic
-        fun getMask(b: Byte): SoftbodyMask {
-            return when (b.toInt()) {
-                0x01 -> BLink
-                0x02 -> Cluster
-                0x04 -> HybridLink
-                else -> BLink
+    enum class SoftbodyMask {
+        BLink,
+        Cluster,
+        HybridLink;
+        companion object {
+            @JvmStatic
+            fun getMask(b: Byte): SoftbodyMask {
+                return when (b.toInt()) {
+                    0x01 -> BLink
+                    0x02 -> Cluster
+                    0x04 -> HybridLink
+                    else -> BLink
+                }
             }
         }
     }
-}
 
-enum class AeroModel {
-    kAeroModelV_TwoSided,
-    kAeroModelV_OneSided,
-    kAeroModelF_TwoSided,
-    kAeroModelF_OneSided,
-}
+    enum class AeroModel {
+        kAeroModelV_TwoSided,
+        kAeroModelV_OneSided,
+        kAeroModelF_TwoSided,
+        kAeroModelF_OneSided,
+    }
 
-class AnchorRigidbody {
-    var m_rigidBodyIndex = 0
-    var m_vertexIndex = 0
-    var	m_nearMode: Byte = 0 // 0:OFF 1:ON
-}
-
-enum class PMXVertexWeight {
-    BDEF1, BDEF2, BDEF4, SDEF, QDEF,
+    class AnchorRigidbody {
+        var m_rigidBodyIndex = 0
+        var m_vertexIndex = 0
+        var	m_nearMode: Byte = 0 // 0:OFF 1:ON
+    }
 }
 
 class PMXVertex {
@@ -365,6 +361,10 @@ class PMXVertex {
     val m_sdefR0 = Vector3f()
     val m_sdefR1 = Vector3f()
     var m_edgeMag = 0f
+
+    enum class PMXVertexWeight {
+        BDEF1, BDEF2, BDEF4, SDEF, QDEF,
+    }
 }
 
 class PMXHeader {
