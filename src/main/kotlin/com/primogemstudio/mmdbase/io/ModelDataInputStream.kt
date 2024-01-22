@@ -483,6 +483,30 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
 
         return file
     }
+
+    fun readSpecString(l: Int): String {
+        return java.lang.String(readNBytes(l), "Shift-jis").toString()
+    }
+
+    fun readVMDFile() {
+        val header = readSpecString(30)
+        var version = 0
+        var modelName = ""
+        if (header.startsWith("Vocaloid Motion Data file")) {
+            version = 1
+            modelName = readSpecString(10)
+        }
+        else if (header.startsWith("Vocaloid Motion Data 0002")){
+            version = 2
+            modelName = readSpecString(20)
+        }
+        println(modelName)
+        val numOfBoneRecord = readLEInt()
+        for (i in 0 until 1) {
+            println(readSpecString(15))
+        }
+        debugBytes(30)
+    }
 }
 
 private fun Any.fetchInt(i: Int): Int {
