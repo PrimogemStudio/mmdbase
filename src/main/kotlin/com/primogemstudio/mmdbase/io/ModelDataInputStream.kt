@@ -69,7 +69,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         input.set(buf[0], buf[1], buf[2], buf[3])
     }
 
-    private fun readHeader(header: PMXHeader) {
+    private fun readPMXHeader(header: PMXHeader) {
         header.m_magic = String(readNBytes(4))
         header.m_version = readLEFloat()
         header.m_dataSize = readByte()
@@ -83,7 +83,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         header.m_rigidbodyIndexSize = readByte()
     }
 
-    private fun readInfo(info: PMXInfo, isU16: Boolean) {
+    private fun readPMXInfo(info: PMXInfo, isU16: Boolean) {
         info.m_modelName = readText(isU16)
         info.m_englishModelName = readText(isU16)
         info.m_comment = readText(isU16)
@@ -120,7 +120,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readVertices(vertices: Array<PMXVertex>, header: PMXHeader) {
+    private fun readPMXVertices(vertices: Array<PMXVertex>, header: PMXHeader) {
         for (vertex in vertices) {
             readVec3(vertex.m_position)
             readVec3(vertex.m_normal)
@@ -158,7 +158,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readFaces(face: Array<PMXFace>, header: PMXHeader) {
+    private fun readPMXFaces(face: Array<PMXFace>, header: PMXHeader) {
         val arr = when (header.m_vertexIndexSize) {
             1.toByte() -> readNBytes(face.size * 3)
             2.toByte() -> readNLEShorts(face.size * 3)
@@ -170,11 +170,11 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readTextures(textures: Array<String>, header: PMXHeader) {
+    private fun readPMXTextures(textures: Array<String>, header: PMXHeader) {
         for (i in textures.indices) textures[i] = readText(header.m_encode == 0.toByte())
     }
 
-    private fun readMaterials(materials: Array<PMXMaterial>, header: PMXHeader) {
+    private fun readPMXMaterials(materials: Array<PMXMaterial>, header: PMXHeader) {
         for (i in materials.indices) {
             materials[i].m_name = readText(header.m_encode == 0.toByte())
             materials[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -199,7 +199,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readBones(bones: Array<PMXBone>, header: PMXHeader) {
+    private fun readPMXBones(bones: Array<PMXBone>, header: PMXHeader) {
         for (i in bones.indices) {
             bones[i].m_name = readText(header.m_encode == 0.toByte())
             bones[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -243,7 +243,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readMorphs(morphs: Array<PMXMorph>, header: PMXHeader) {
+    private fun readPMXMorphs(morphs: Array<PMXMorph>, header: PMXHeader) {
         for (i in morphs.indices) {
             morphs[i].m_name = readText(header.m_encode == 0.toByte())
             morphs[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -331,7 +331,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readDisplayFrames(frames: Array<PMXDisplayFrame>, header: PMXHeader) {
+    private fun readPMXDisplayFrames(frames: Array<PMXDisplayFrame>, header: PMXHeader) {
         for (i in frames.indices) {
             frames[i].m_name = readText(header.m_encode == 0.toByte())
             frames[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -350,7 +350,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readRigidBodies(rigidbodies: Array<PMXRigidBody>, header: PMXHeader) {
+    private fun readPMXRigidBodies(rigidbodies: Array<PMXRigidBody>, header: PMXHeader) {
         for (i in rigidbodies.indices) {
             rigidbodies[i].m_name = readText(header.m_encode == 0.toByte())
             rigidbodies[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -371,7 +371,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readJoints(joints: Array<PMXJoint>, header: PMXHeader) {
+    private fun readPMXJoints(joints: Array<PMXJoint>, header: PMXHeader) {
         for (i in joints.indices) {
             joints[i].m_name = readText(header.m_encode == 0.toByte())
             joints[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -390,7 +390,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    private fun readSoftBodies(bodies: Array<PMXSoftBody>, header: PMXHeader) {
+    private fun readPMXSoftBodies(bodies: Array<PMXSoftBody>, header: PMXHeader) {
         for (i in bodies.indices) {
             bodies[i].m_name = readText(header.m_encode == 0.toByte())
             bodies[i].m_englishName = readText(header.m_encode == 0.toByte())
@@ -456,29 +456,29 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
 
     fun readPMXFile(): PMXFile {
         val file = PMXFile()
-        readHeader(file.m_header)
-        readInfo(file.m_info, file.m_header.m_encode == 0.toByte())
+        readPMXHeader(file.m_header)
+        readPMXInfo(file.m_info, file.m_header.m_encode == 0.toByte())
         file.m_vertices = Array(readLEInt()) { PMXVertex() }
-        readVertices(file.m_vertices, file.m_header)
+        readPMXVertices(file.m_vertices, file.m_header)
         file.m_faces = Array(readLEInt() / 3) { PMXFace() }
-        readFaces(file.m_faces, file.m_header)
+        readPMXFaces(file.m_faces, file.m_header)
         file.m_textures = Array(readLEInt()) { "" }
-        readTextures(file.m_textures, file.m_header)
+        readPMXTextures(file.m_textures, file.m_header)
         file.m_materials = Array(readLEInt()) { PMXMaterial() }
-        readMaterials(file.m_materials, file.m_header)
+        readPMXMaterials(file.m_materials, file.m_header)
         file.m_bones = Array(readLEInt()) { PMXBone() }
-        readBones(file.m_bones, file.m_header)
+        readPMXBones(file.m_bones, file.m_header)
         file.m_morphs = Array(readLEInt()) { PMXMorph() }
-        readMorphs(file.m_morphs, file.m_header)
+        readPMXMorphs(file.m_morphs, file.m_header)
         file.m_displayFrames = Array(readLEInt()) { PMXDisplayFrame() }
-        readDisplayFrames(file.m_displayFrames, file.m_header)
+        readPMXDisplayFrames(file.m_displayFrames, file.m_header)
         file.m_rigidbodies = Array(readLEInt()) { PMXRigidBody() }
-        readRigidBodies(file.m_rigidbodies, file.m_header)
+        readPMXRigidBodies(file.m_rigidbodies, file.m_header)
         file.m_joints = Array(readLEInt()) { PMXJoint() }
-        readJoints(file.m_joints, file.m_header)
+        readPMXJoints(file.m_joints, file.m_header)
         if (available() > 0) {
             file.m_softbodies = Array(readLEInt()) { PMXSoftBody() }
-            readSoftBodies(file.m_softbodies, file.m_header)
+            readPMXSoftBodies(file.m_softbodies, file.m_header)
         }
 
         return file
@@ -488,19 +488,18 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         return java.lang.String(readNBytes(l), "Shift-jis").toString()
     }
 
-    fun readVMDFile() {
+    fun readVMDHeader(file: VMDFile) {
         val header = readSpecString(30)
-        var version = 0
-        var modelName = ""
-        if (header.startsWith("Vocaloid Motion Data file")) {
-            version = 1
-            modelName = readSpecString(10)
-        }
-        else if (header.startsWith("Vocaloid Motion Data 0002")){
-            version = 2
-            modelName = readSpecString(20)
-        }
-        println(modelName)
+        val h = VMDHeader()
+        h.m_header = header
+        if (header.startsWith("Vocaloid Motion Data file")) h.m_modelName = readSpecString(10)
+        else if (header.startsWith("Vocaloid Motion Data 0002")) h.m_modelName = readSpecString(20)
+        file.m_header = h
+    }
+
+    fun readVMDFile() {
+        val file = VMDFile()
+        readVMDHeader(file)
         val numOfBoneRecord = readLEInt()
         for (i in 0 until 1) {
             println(readSpecString(15))
