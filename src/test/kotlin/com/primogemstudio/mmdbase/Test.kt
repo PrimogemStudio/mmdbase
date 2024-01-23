@@ -6,5 +6,6 @@ import java.nio.file.Paths
 
 fun main() {
     val inp = ModelDataInputStream(Files.newInputStream(Paths.get("E:/mmd/actions/idle.vmd")))
-    inp.readVMDFile()
+    val data = inp.readVMDFile()
+    println(data)
 }

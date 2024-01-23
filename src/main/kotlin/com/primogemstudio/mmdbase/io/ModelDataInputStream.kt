@@ -497,14 +497,92 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         file.m_header = h
     }
 
-    fun readVMDFile() {
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun readVMDMotion(motions: Array<VMDMotion>) {
+        for (i in motions.indices) {
+            motions[i].m_boneName = readSpecString(15)
+            motions[i].m_frame = readLEInt().toUInt()
+            readVec3(motions[i].m_translate)
+            readQuaternion(motions[i].m_quaternion)
+            motions[i].m_interpolation = readNBytes(64).toUByteArray()
+        }
+    }
+    fun readVMDMorphs(morphs: Array<VMDMorph>) {
+        for (i in morphs.indices) {
+            morphs[i].m_blendShapeName = readSpecString(15)
+            morphs[i].m_frame = readLEInt().toUInt()
+            morphs[i].m_weight = readLEFloat()
+        }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun readVMDCamera(cameras: Array<VMDCamera>) {
+        for (i in cameras.indices) {
+            cameras[i].m_frame = readLEInt().toUInt()
+            cameras[i].m_distance = readLEFloat()
+            readVec3(cameras[i].m_interest)
+            readVec3(cameras[i].m_rotate)
+            cameras[i].m_interpolation = readNBytes(24).toUByteArray()
+            cameras[i].m_viewAngle = readLEInt().toUInt()
+            cameras[i].m_isPerspective = readByte().toUByte()
+        }
+    }
+
+    fun readVMDLights(lights: Array<VMDLight>) {
+        for (i in lights.indices) {
+            lights[i].m_frame = readLEInt().toUInt()
+            readVec3(lights[i].m_color)
+            readVec3(lights[i].m_position)
+        }
+    }
+
+    fun readVMDShadows(shadows: Array<VMDShadow>) {
+        for (i in shadows.indices) {
+            shadows[i].m_frame = readLEInt().toUInt()
+            shadows[i].m_shadowType = readByte().toUByte()
+            shadows[i].m_distance = readFloat()
+        }
+    }
+
+    fun readVMDIks(iks: Array<VMDIk>) {
+        for (i in iks.indices) {
+            iks[i].m_frame = readLEInt().toUInt()
+            iks[i].m_show = readByte().toUByte()
+            iks[i].m_ikInfos = Array(readLEInt()) { VMDIkInfo() }
+            for (j in iks[i].m_ikInfos.indices) {
+                iks[i].m_ikInfos[j].m_name = readSpecString(20)
+                iks[i].m_ikInfos[j].m_enable = readByte().toUByte()
+            }
+        }
+    }
+
+    fun readVMDFile(): VMDFile {
         val file = VMDFile()
         readVMDHeader(file)
-        val numOfBoneRecord = readLEInt()
-        for (i in 0 until 1) {
-            println(readSpecString(15))
+        file.m_motions = Array(readLEInt()) { VMDMotion() }
+        readVMDMotion(file.m_motions)
+        val func = { available() > 0 }
+        if (func()) {
+            file.m_morphs = Array(readLEInt()) { VMDMorph() }
+            readVMDMorphs(file.m_morphs)
         }
-        debugBytes(30)
+        if (func()) {
+            file.m_cameras = Array(readLEInt()) { VMDCamera() }
+            readVMDCamera(file.m_cameras)
+        }
+        if (func()) {
+            file.m_lights = Array(readLEInt()) { VMDLight() }
+            readVMDLights(file.m_lights)
+        }
+        if (func()) {
+            file.m_shadows = Array(readLEInt()) { VMDShadow() }
+            readVMDShadows(file.m_shadows)
+        }
+        if (func()) {
+            file.m_iks = Array(readLEInt()) { VMDIk() }
+            readVMDIks(file.m_iks)
+        }
+        return file
     }
 }
 
