@@ -10,15 +10,16 @@ group = 'io.github.primogemstudio'
 version = '0.0.2-alpha1'
 
 repositories {
-    maven { url = 'https://maven.aliyun.com/repository/jcenter' }
+    maven { url = 'https://raw.githubusercontent.com/kotlin-graphics/mary/master' }
+    /*maven { url = 'https://maven.aliyun.com/repository/jcenter' }
     maven { url = 'https://maven.aliyun.com/repository/google' }
-    maven { url = 'https://maven.aliyun.com/repository/public' }
+    maven { url = 'https://maven.aliyun.com/repository/public' }*/
     mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.jetbrains.kotlin:kotlin-test'
     implementation "org.joml:joml:1.10.5"
+    implementation "kotlin.graphics:glm:0.9.9.1-11"
 }
 
 test {
