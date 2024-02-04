@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
     implementation "org.joml:joml:1.10.5"
     implementation "kotlin.graphics:glm:0.9.9.1-11"
 }
