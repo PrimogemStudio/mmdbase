@@ -449,10 +449,6 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    fun debugBytes(i: Int) {
-        readNBytes(i).forEach { print(String.format("%02X ", it)) }
-    }
-
     fun readPMXFile(): PMXFile {
         val file = PMXFile()
         readPMXHeader(file.m_header)
@@ -497,7 +493,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun readVMDMotion(motions: Array<VMDMotion>) {
+    private fun readVMDMotion(motions: Array<VMDMotion>) {
         for (i in motions.indices) {
             motions[i].m_boneName = readSpecString(15)
             motions[i].m_frame = readLEInt().toUInt()
@@ -515,7 +511,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    fun readVMDCamera(cameras: Array<VMDCamera>) {
+    private fun readVMDCamera(cameras: Array<VMDCamera>) {
         for (i in cameras.indices) {
             cameras[i].m_frame = readLEInt().toUInt()
             cameras[i].m_distance = readLEFloat()
