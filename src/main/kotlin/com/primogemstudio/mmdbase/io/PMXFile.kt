@@ -1,25 +1,25 @@
 package com.primogemstudio.mmdbase.io
 
 import com.primogemstudio.mmdbase.abstraction.ITextureManager
-import org.joml.Quaternionf
-import org.joml.Vector2f
-import org.joml.Vector3f
-import org.joml.Vector4f
+import glm_.quat.Quat
+import glm_.vec2.Vec2
+import glm_.vec3.Vec3
+import glm_.vec4.Vec4
 
 class PMXBone {
     var m_name = ""
     var m_englishName = ""
-    var m_position = Vector3f()
+    var m_position = Vec3()
     var m_parentBoneIndex = 0
     var m_deformDepth = 0
     var m_boneFlag = 0
-    var m_positionOffset = Vector3f()
+    var m_positionOffset = Vec3()
     var m_linkBoneIndex = 0
     var m_appendBoneIndex = 0
     var m_appendWeight = 0f
-    var m_fixedAxis = Vector3f()
-    var m_localXAxis = Vector3f()
-    var m_localZAxis = Vector3f()
+    var m_fixedAxis = Vec3()
+    var m_localXAxis = Vec3()
+    var m_localZAxis = Vec3()
     var m_keyValue = 0
     var m_ikTargetBoneIndex = 0
     var m_ikIterationCount = 0
@@ -30,8 +30,8 @@ class PMXBone {
         var m_ikBoneIndex = 0
         var m_enableLimit: Byte = 0
 
-        var m_limitMin = Vector3f()
-        var m_limitMax = Vector3f()
+        var m_limitMin = Vec3()
+        var m_limitMax = Vec3()
     }
 }
 
@@ -82,14 +82,14 @@ class PMXJoint {
     var m_type = JointType.SpringDOF6
     var m_rigidbodyAIndex = 0
     var m_rigidbodyBIndex = 0
-    var m_translate = Vector3f()
-    var m_rotate = Vector3f()
-    var m_translateLowerLimit = Vector3f()
-    var m_translateUpperLimit = Vector3f()
-    var m_rotateLowerLimit = Vector3f()
-    var m_rotateUpperLimit = Vector3f()
-    var m_springTranslateFactor = Vector3f()
-    var m_springRotateFactor = Vector3f()
+    var m_translate = Vec3()
+    var m_rotate = Vec3()
+    var m_translateLowerLimit = Vec3()
+    var m_translateUpperLimit = Vec3()
+    var m_rotateLowerLimit = Vec3()
+    var m_rotateUpperLimit = Vec3()
+    var m_springTranslateFactor = Vec3()
+    var m_springRotateFactor = Vec3()
 
     enum class JointType {
         SpringDOF6,
@@ -104,12 +104,12 @@ class PMXJoint {
 class PMXMaterial {
     var m_name = ""
     var m_englishName = ""
-    var m_diffuse = Vector4f()
-    var m_specular = Vector3f()
+    var m_diffuse = Vec4()
+    var m_specular = Vec3()
     var m_specularPower = 0f
-    var m_ambient = Vector3f()
+    var m_ambient = Vec3()
     var m_drawMode = PMXDrawModeFlags.BothFace
-    var m_edgeColor = Vector4f()
+    var m_edgeColor = Vec4()
     var m_edgeSize = 0f
     var m_textureIndex = 0
     var m_sphereTextureIndex = 0
@@ -188,18 +188,18 @@ class PMXMorph {
 
     class PositionMorph {
         var m_vertexIndex = 0
-        var m_position = Vector3f()
+        var m_position = Vec3()
     }
 
     class UVMorph {
         var m_vertexIndex = 0
-        var m_uv = Vector4f()
+        var m_uv = Vec4()
     }
 
     class BoneMorph {
         var m_boneIndex = 0
-        var m_position = Vector3f()
-        var m_quaternion = Quaternionf()
+        var m_position = Vec3()
+        var m_quaternion = Quat()
     }
 
     class MaterialMorph {
@@ -210,15 +210,15 @@ class PMXMorph {
 
         var m_materialIndex = 0
         var m_opType = OpType.Mul
-        var m_diffuse = Vector4f()
-        var m_specular = Vector3f()
+        var m_diffuse = Vec4()
+        var m_specular = Vec3()
         var m_specularPower = 0f
-        var m_ambient = Vector3f()
-        var m_edgeColor = Vector4f()
+        var m_ambient = Vec3()
+        var m_edgeColor = Vec4()
         var m_edgeSize = 0f
-        var m_textureFactor = Vector4f()
-        var m_sphereTextureFactor = Vector4f()
-        var m_toonTextureFactor = Vector4f()
+        var m_textureFactor = Vec4()
+        var m_sphereTextureFactor = Vec4()
+        var m_toonTextureFactor = Vec4()
     }
 
     class GroupMorph {
@@ -234,8 +234,8 @@ class PMXMorph {
     class ImpulseMorph {
         var m_rigidbodyIndex = 0
         var m_localFlag: Byte = 0	//0:OFF 1:ON
-        var m_translateVelocity = Vector3f()
-        var m_rotateTorque = Vector3f()
+        var m_translateVelocity = Vec3()
+        var m_rotateTorque = Vec3()
     }
 }
 
@@ -246,9 +246,9 @@ class PMXRigidBody {
     var m_group: Byte = 0
     var m_collisionGroup: Short = 0
     var m_shape = Shape.Sphere
-    var m_shapeSize = Vector3f()
-    var m_translate = Vector3f()
-    var m_rotate = Vector3f()
+    var m_shapeSize = Vec3()
+    var m_translate = Vec3()
+    var m_rotate = Vec3()
     var m_mass = 0f
     var m_translateDimmer = 0f
     var m_rotateDimmer = 0f
@@ -350,16 +350,16 @@ class PMXSoftBody {
 }
 
 class PMXVertex {
-    val m_position = Vector3f()
-    val m_normal = Vector3f()
-    val m_uv = Vector2f()
-    val m_addUV = arrayOf(Vector4f(), Vector4f(), Vector4f(), Vector4f())
+    var m_position = Vec3()
+    var m_normal = Vec3()
+    var m_uv = Vec2()
+    val m_addUV = arrayOf(Vec4(), Vec4(), Vec4(), Vec4())
     var m_weightType = PMXVertexWeight.BDEF1
     val m_boneIndices = arrayOf(0, 0, 0, 0)
-    val m_boneWeights = Vector4f()
-    val m_sdefC = Vector3f()
-    val m_sdefR0 = Vector3f()
-    val m_sdefR1 = Vector3f()
+    var m_boneWeights = Vec4()
+    var m_sdefC = Vec3()
+    var m_sdefR0 = Vec3()
+    var m_sdefR1 = Vec3()
     var m_edgeMag = 0f
 
     enum class PMXVertexWeight {

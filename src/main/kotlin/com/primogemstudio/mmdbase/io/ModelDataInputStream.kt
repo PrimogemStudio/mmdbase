@@ -1,9 +1,9 @@
 package com.primogemstudio.mmdbase.io
 
-import org.joml.Quaternionf
-import org.joml.Vector2f
-import org.joml.Vector3f
-import org.joml.Vector4f
+import glm_.quat.Quat
+import glm_.vec2.Vec2
+import glm_.vec3.Vec3
+import glm_.vec4.Vec4
 import java.io.DataInputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
@@ -52,21 +52,20 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         return arr
     }
 
-    private fun readVec2(input: Vector2f) {
-        input.set(readNLEFloats(2))
+    private fun readVec2(): Vec2 {
+        return Vec2(readNLEFloats(2))
     }
 
-    private fun readVec3(input: Vector3f) {
-        input.set(readNLEFloats(3))
+    private fun readVec3(): Vec3 {
+        return Vec3(readNLEFloats(3))
     }
 
-    private fun readVec4(input: Vector4f) {
-        input.set(readNLEFloats(4))
+    private fun readVec4(): Vec4 {
+        return Vec4(readNLEFloats(4))
     }
 
-    private fun readQuaternion(input: Quaternionf) {
-        val buf = readNLEFloats(4)
-        input.set(buf[0], buf[1], buf[2], buf[3])
+    private fun readQuat(): Quat {
+        return Quat(readVec4())
     }
 
     private fun readPMXHeader(header: PMXHeader) {
@@ -122,11 +121,11 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
 
     private fun readPMXVertices(vertices: Array<PMXVertex>, header: PMXHeader) {
         for (vertex in vertices) {
-            readVec3(vertex.m_position)
-            readVec3(vertex.m_normal)
-            readVec2(vertex.m_uv)
+            vertex.m_position = readVec3()
+            vertex.m_normal = readVec3()
+            vertex.m_uv = readVec2()
             for (i in 0..<header.m_addUVNum) {
-                readVec4(vertex.m_addUV[i])
+                vertex.m_addUV[i] = readVec4()
             }
             vertex.m_weightType = PMXVertex.PMXVertexWeight.entries[readByte().toInt()]
             when (vertex.m_weightType) {
@@ -142,16 +141,16 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                     readIndex(vertex.m_boneIndices, 1, header.m_boneIndexSize.toInt())
                     readIndex(vertex.m_boneIndices, 2, header.m_boneIndexSize.toInt())
                     readIndex(vertex.m_boneIndices, 3, header.m_boneIndexSize.toInt())
-                    readVec4(vertex.m_boneWeights)
+                    vertex.m_boneWeights = readVec4()
                 }
 
                 PMXVertex.PMXVertexWeight.SDEF -> {
                     readIndex(vertex.m_boneIndices, 0, header.m_boneIndexSize.toInt())
                     readIndex(vertex.m_boneIndices, 1, header.m_boneIndexSize.toInt())
                     vertex.m_boneWeights.x = readLEFloat()
-                    readVec3(vertex.m_sdefC)
-                    readVec3(vertex.m_sdefR0)
-                    readVec3(vertex.m_sdefR1)
+                    vertex.m_sdefC = readVec3()
+                    vertex.m_sdefR0 = readVec3()
+                    vertex.m_sdefR1 = readVec3()
                 }
             }
             vertex.m_edgeMag = readLEFloat()
@@ -178,12 +177,12 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         for (i in materials.indices) {
             materials[i].m_name = readText(header.m_encode == 0.toByte())
             materials[i].m_englishName = readText(header.m_encode == 0.toByte())
-            readVec4(materials[i].m_diffuse)
-            readVec3(materials[i].m_specular)
+            materials[i].m_diffuse = readVec4()
+            materials[i].m_specular = readVec3()
             materials[i].m_specularPower = readLEFloat()
-            readVec3(materials[i].m_ambient)
+            materials[i].m_ambient = readVec3()
             materials[i].m_drawMode = PMXMaterial.PMXDrawModeFlags.findMode(readByte())
-            readVec4(materials[i].m_edgeColor)
+            materials[i].m_edgeColor = readVec4()
             materials[i].m_edgeSize = readLEFloat()
             materials[i].m_textureIndex = readIndex(header.m_textureIndexSize.toInt())
             materials[i].m_sphereTextureIndex = readIndex(header.m_textureIndexSize.toInt())
@@ -203,14 +202,14 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         for (i in bones.indices) {
             bones[i].m_name = readText(header.m_encode == 0.toByte())
             bones[i].m_englishName = readText(header.m_encode == 0.toByte())
-            readVec3(bones[i].m_position)
+            bones[i].m_position = readVec3()
             bones[i].m_parentBoneIndex = readIndex(header.m_boneIndexSize.toInt())
             bones[i].m_deformDepth = readLEInt()
             bones[i].m_boneFlag = readLEShort().toInt()
 
             val flag = bones[i].m_boneFlag
 
-            if (flag and PMXBoneFlags.TargetShowMode.flag == 0) readVec3(bones[i].m_positionOffset)
+            if (flag and PMXBoneFlags.TargetShowMode.flag == 0) bones[i].m_positionOffset = readVec3()
             else bones[i].m_linkBoneIndex = readIndex(header.m_boneIndexSize.toInt())
 
             if ((flag and PMXBoneFlags.AppendRotate.flag) != 0 || (flag and PMXBoneFlags.AppendTranslate.flag) != 0) {
@@ -218,10 +217,10 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                 bones[i].m_appendWeight = readLEFloat()
             }
 
-            if ((flag and PMXBoneFlags.FixedAxis.flag) != 0) readVec3(bones[i].m_fixedAxis)
+            if ((flag and PMXBoneFlags.FixedAxis.flag) != 0) bones[i].m_fixedAxis = readVec3()
             if ((flag and PMXBoneFlags.LocalAxis.flag) != 0) {
-                readVec3(bones[i].m_localXAxis)
-                readVec3(bones[i].m_localZAxis)
+                bones[i].m_localXAxis = readVec3()
+                bones[i].m_localZAxis = readVec3()
             }
             if ((flag and PMXBoneFlags.DeformOuterParent.flag) != 0) bones[i].m_keyValue = readLEInt()
             if ((flag and PMXBoneFlags.IK.flag) != 0) {
@@ -229,14 +228,14 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                 bones[i].m_ikIterationCount = readLEInt()
                 bones[i].m_ikLimit = readLEFloat()
 
-                val lnk_siz = readLEInt()
-                bones[i].m_ikLinks = Array(lnk_siz) { PMXBone.PMXIKLink() }
+                val size = readLEInt()
+                bones[i].m_ikLinks = Array(size) { PMXBone.PMXIKLink() }
                 for (j in bones[i].m_ikLinks.indices) {
                     bones[i].m_ikLinks[j].m_ikBoneIndex = readIndex(header.m_boneIndexSize.toInt())
                     bones[i].m_ikLinks[j].m_enableLimit = readByte()
                     if (bones[i].m_ikLinks[j].m_enableLimit.toUByte() != 0.toUByte()) {
-                        readVec3(bones[i].m_ikLinks[j].m_limitMin)
-                        readVec3(bones[i].m_ikLinks[j].m_limitMax)
+                        bones[i].m_ikLinks[j].m_limitMin = readVec3()
+                        bones[i].m_ikLinks[j].m_limitMax = readVec3()
                     }
                 }
             }
@@ -249,14 +248,14 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
             morphs[i].m_englishName = readText(header.m_encode == 0.toByte())
             morphs[i].m_controlPanel = readByte()
             morphs[i].m_morphType = PMXMorph.PMXMorphType.entries[readByte().toInt()]
-            val data_cnt = readLEInt()
+            val size = readLEInt()
             val type = morphs[i].m_morphType
             when {
                 type == PMXMorph.PMXMorphType.Position -> {
-                    morphs[i].m_positionMorph = Array(data_cnt) { PMXMorph.PositionMorph() }
+                    morphs[i].m_positionMorph = Array(size) { PMXMorph.PositionMorph() }
                     for (j in morphs[i].m_positionMorph.indices) {
                         morphs[i].m_positionMorph[j].m_vertexIndex = readIndex(header.m_vertexIndexSize.toInt())
-                        readVec3(morphs[i].m_positionMorph[j].m_position)
+                        morphs[i].m_positionMorph[j].m_position = readVec3()
                     }
                 }
 
@@ -267,41 +266,41 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                     PMXMorph.PMXMorphType.AddUV3,
                     PMXMorph.PMXMorphType.AddUV4
                 ).contains(type) -> {
-                    morphs[i].m_uvMorph = Array(data_cnt) { PMXMorph.UVMorph() }
+                    morphs[i].m_uvMorph = Array(size) { PMXMorph.UVMorph() }
                     for (j in morphs[i].m_uvMorph.indices) {
                         morphs[i].m_uvMorph[j].m_vertexIndex = readIndex(header.m_vertexIndexSize.toInt())
-                        readVec4(morphs[i].m_uvMorph[j].m_uv)
+                        morphs[i].m_uvMorph[j].m_uv = readVec4()
                     }
                 }
 
                 type == PMXMorph.PMXMorphType.Bone -> {
-                    morphs[i].m_boneMorph = Array(data_cnt) { PMXMorph.BoneMorph() }
+                    morphs[i].m_boneMorph = Array(size) { PMXMorph.BoneMorph() }
                     for (j in morphs[i].m_boneMorph.indices) {
                         morphs[i].m_boneMorph[j].m_boneIndex = readIndex(header.m_boneIndexSize.toInt())
-                        readVec3(morphs[i].m_boneMorph[j].m_position)
-                        readQuaternion(morphs[i].m_boneMorph[j].m_quaternion)
+                        morphs[i].m_boneMorph[j].m_position = readVec3()
+                        morphs[i].m_boneMorph[j].m_quaternion = readQuat()
                     }
                 }
 
                 type == PMXMorph.PMXMorphType.Material -> {
-                    morphs[i].m_materialMorph = Array(data_cnt) { PMXMorph.MaterialMorph() }
+                    morphs[i].m_materialMorph = Array(size) { PMXMorph.MaterialMorph() }
                     for (j in morphs[i].m_materialMorph.indices) {
                         morphs[i].m_materialMorph[j].m_materialIndex = readIndex(header.m_materialIndexSize.toInt())
                         morphs[i].m_materialMorph[j].m_opType = PMXMorph.MaterialMorph.OpType.entries[readByte().toInt()]
-                        readVec4(morphs[i].m_materialMorph[j].m_diffuse)
-                        readVec3(morphs[i].m_materialMorph[j].m_specular)
+                        morphs[i].m_materialMorph[j].m_diffuse = readVec4()
+                        morphs[i].m_materialMorph[j].m_specular = readVec3()
                         morphs[i].m_materialMorph[j].m_specularPower = readLEFloat()
-                        readVec3(morphs[i].m_materialMorph[j].m_ambient)
-                        readVec4(morphs[i].m_materialMorph[j].m_edgeColor)
+                        morphs[i].m_materialMorph[j].m_ambient = readVec3()
+                        morphs[i].m_materialMorph[j].m_edgeColor = readVec4()
                         morphs[i].m_materialMorph[j].m_edgeSize = readLEFloat()
-                        readVec4(morphs[i].m_materialMorph[j].m_textureFactor)
-                        readVec4(morphs[i].m_materialMorph[j].m_sphereTextureFactor)
-                        readVec4(morphs[i].m_materialMorph[j].m_toonTextureFactor)
+                        morphs[i].m_materialMorph[j].m_textureFactor = readVec4()
+                        morphs[i].m_materialMorph[j].m_sphereTextureFactor = readVec4()
+                        morphs[i].m_materialMorph[j].m_toonTextureFactor = readVec4()
                     }
                 }
 
                 type == PMXMorph.PMXMorphType.Group -> {
-                    morphs[i].m_groupMorph = Array(data_cnt) { PMXMorph.GroupMorph() }
+                    morphs[i].m_groupMorph = Array(size) { PMXMorph.GroupMorph() }
                     for (j in morphs[i].m_groupMorph.indices) {
                         morphs[i].m_groupMorph[j].m_morphIndex = readIndex(header.m_morphIndexSize.toInt())
                         morphs[i].m_groupMorph[j].m_weight = readLEFloat()
@@ -309,7 +308,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                 }
 
                 type == PMXMorph.PMXMorphType.Flip -> {
-                    morphs[i].m_flipMorph = Array(data_cnt) { PMXMorph.FlipMorph() }
+                    morphs[i].m_flipMorph = Array(size) { PMXMorph.FlipMorph() }
                     for (j in morphs[i].m_flipMorph.indices) {
                         morphs[i].m_flipMorph[j].m_morphIndex = readIndex(header.m_morphIndexSize.toInt())
                         morphs[i].m_flipMorph[j].m_weight = readLEFloat()
@@ -317,12 +316,12 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
                 }
 
                 type == PMXMorph.PMXMorphType.Impluse -> {
-                    morphs[i].m_impulseMorph = Array(data_cnt) { PMXMorph.ImpulseMorph() }
+                    morphs[i].m_impulseMorph = Array(size) { PMXMorph.ImpulseMorph() }
                     for (j in morphs[i].m_impulseMorph.indices) {
                         morphs[i].m_impulseMorph[j].m_rigidbodyIndex = readIndex(header.m_rigidbodyIndexSize.toInt())
                         morphs[i].m_impulseMorph[j].m_localFlag = readByte()
-                        readVec3(morphs[i].m_impulseMorph[j].m_translateVelocity)
-                        readVec3(morphs[i].m_impulseMorph[j].m_rotateTorque)
+                        morphs[i].m_impulseMorph[j].m_translateVelocity = readVec3()
+                        morphs[i].m_impulseMorph[j].m_rotateTorque = readVec3()
                     }
                 }
 
@@ -358,9 +357,9 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
             rigidbodies[i].m_group = readByte()
             rigidbodies[i].m_collisionGroup = readLEShort()
             rigidbodies[i].m_shape = PMXRigidBody.Shape.entries[readByte().toInt()]
-            readVec3(rigidbodies[i].m_shapeSize)
-            readVec3(rigidbodies[i].m_translate)
-            readVec3(rigidbodies[i].m_rotate)
+            rigidbodies[i].m_shapeSize = readVec3()
+            rigidbodies[i].m_translate = readVec3()
+            rigidbodies[i].m_rotate = readVec3()
 
             rigidbodies[i].m_mass = readLEFloat()
             rigidbodies[i].m_translateDimmer = readLEFloat()
@@ -379,14 +378,14 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
             joints[i].m_rigidbodyAIndex = readIndex(header.m_rigidbodyIndexSize.toInt())
             joints[i].m_rigidbodyBIndex = readIndex(header.m_rigidbodyIndexSize.toInt())
 
-            readVec3(joints[i].m_translate)
-            readVec3(joints[i].m_rotate)
-            readVec3(joints[i].m_translateLowerLimit)
-            readVec3(joints[i].m_translateUpperLimit)
-            readVec3(joints[i].m_rotateLowerLimit)
-            readVec3(joints[i].m_rotateUpperLimit)
-            readVec3(joints[i].m_springTranslateFactor)
-            readVec3(joints[i].m_springRotateFactor)
+            joints[i].m_translate = readVec3()
+            joints[i].m_rotate = readVec3()
+            joints[i].m_translateLowerLimit = readVec3()
+            joints[i].m_translateUpperLimit = readVec3()
+            joints[i].m_rotateLowerLimit = readVec3()
+            joints[i].m_rotateUpperLimit = readVec3()
+            joints[i].m_springTranslateFactor = readVec3()
+            joints[i].m_springRotateFactor = readVec3()
         }
     }
 
@@ -434,16 +433,16 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
             bodies[i].m_AST = readLEFloat()
             bodies[i].m_VST = readLEFloat()
 
-            val ar_cnt = readLEInt()
-            bodies[i].m_anchorRigidBodies = Array(ar_cnt) { PMXSoftBody.AnchorRigidbody() }
+            val arcnt = readLEInt()
+            bodies[i].m_anchorRigidBodies = Array(arcnt) { PMXSoftBody.AnchorRigidbody() }
             for (j in bodies[i].m_anchorRigidBodies.indices) {
                 bodies[i].m_anchorRigidBodies[j].m_rigidBodyIndex = readIndex(header.m_rigidbodyIndexSize.toInt())
                 bodies[i].m_anchorRigidBodies[j].m_vertexIndex = readIndex(header.m_vertexIndexSize.toInt())
                 bodies[i].m_anchorRigidBodies[j].m_nearMode = readByte()
             }
 
-            val pv_cnt = readLEInt()
-            bodies[i].m_pinVertexIndices = Array(pv_cnt) { 0 }
+            val pvcnt = readLEInt()
+            bodies[i].m_pinVertexIndices = Array(pvcnt) { 0 }
             for (n in bodies[i].m_pinVertexIndices.indices) {
                 bodies[i].m_pinVertexIndices[n] = readIndex(header.m_vertexIndexSize.toInt())
             }
@@ -484,11 +483,11 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         return file
     }
 
-    fun readSpecString(l: Int): String {
+    private fun readSpecString(l: Int): String {
         return java.lang.String(readNBytes(l), "Shift-jis").toString()
     }
 
-    fun readVMDHeader(file: VMDFile) {
+    private fun readVMDHeader(file: VMDFile) {
         val header = readSpecString(30)
         val h = VMDHeader()
         h.m_header = header
@@ -502,12 +501,12 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         for (i in motions.indices) {
             motions[i].m_boneName = readSpecString(15)
             motions[i].m_frame = readLEInt().toUInt()
-            readVec3(motions[i].m_translate)
-            readQuaternion(motions[i].m_quaternion)
+            motions[i].m_translate = readVec3()
+            motions[i].m_quaternion = readQuat()
             motions[i].m_interpolation = readNBytes(64).toUByteArray()
         }
     }
-    fun readVMDMorphs(morphs: Array<VMDMorph>) {
+    private fun readVMDMorphs(morphs: Array<VMDMorph>) {
         for (i in morphs.indices) {
             morphs[i].m_blendShapeName = readSpecString(15)
             morphs[i].m_frame = readLEInt().toUInt()
@@ -520,23 +519,23 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         for (i in cameras.indices) {
             cameras[i].m_frame = readLEInt().toUInt()
             cameras[i].m_distance = readLEFloat()
-            readVec3(cameras[i].m_interest)
-            readVec3(cameras[i].m_rotate)
+            cameras[i].m_interest = readVec3()
+            cameras[i].m_rotate = readVec3()
             cameras[i].m_interpolation = readNBytes(24).toUByteArray()
             cameras[i].m_viewAngle = readLEInt().toUInt()
             cameras[i].m_isPerspective = readByte().toUByte()
         }
     }
 
-    fun readVMDLights(lights: Array<VMDLight>) {
+    private fun readVMDLights(lights: Array<VMDLight>) {
         for (i in lights.indices) {
             lights[i].m_frame = readLEInt().toUInt()
-            readVec3(lights[i].m_color)
-            readVec3(lights[i].m_position)
+            lights[i].m_color = readVec3()
+            lights[i].m_position = readVec3()
         }
     }
 
-    fun readVMDShadows(shadows: Array<VMDShadow>) {
+    private fun readVMDShadows(shadows: Array<VMDShadow>) {
         for (i in shadows.indices) {
             shadows[i].m_frame = readLEInt().toUInt()
             shadows[i].m_shadowType = readByte().toUByte()
@@ -544,7 +543,7 @@ class ModelDataInputStream(flow: InputStream) : DataInputStream(flow) {
         }
     }
 
-    fun readVMDIks(iks: Array<VMDIk>) {
+    private fun readVMDIks(iks: Array<VMDIk>) {
         for (i in iks.indices) {
             iks[i].m_frame = readLEInt().toUInt()
             iks[i].m_show = readByte().toUByte()

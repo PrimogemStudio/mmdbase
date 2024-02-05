@@ -1,7 +1,7 @@
 package com.primogemstudio.mmdbase.io
 
-import org.joml.Quaternionf
-import org.joml.Vector3f
+import glm_.quat.Quat
+import glm_.vec3.Vec3
 
 class VMDHeader {
     var m_header: String = ""
@@ -11,8 +11,8 @@ class VMDHeader {
 class VMDMotion {
     var m_boneName: String = ""
     var m_frame: UInt = 0u
-    var m_translate: Vector3f = Vector3f()
-    var m_quaternion: Quaternionf = Quaternionf()
+    var m_translate = Vec3()
+    var m_quaternion = Quat()
     @OptIn(ExperimentalUnsignedTypes::class)
     var m_interpolation: UByteArray = UByteArray(64)
 }
@@ -26,8 +26,8 @@ class VMDMorph {
 class VMDCamera {
     var m_frame: UInt = 0u
     var m_distance: Float = 0f
-    var m_interest: Vector3f = Vector3f()
-    var m_rotate: Vector3f = Vector3f()
+    var m_interest = Vec3()
+    var m_rotate = Vec3()
     @OptIn(ExperimentalUnsignedTypes::class)
     var m_interpolation: UByteArray = UByteArray(24)
     var m_viewAngle: UInt = 0u
@@ -36,8 +36,8 @@ class VMDCamera {
 
 class VMDLight {
     var m_frame: UInt = 0u
-    var m_color: Vector3f = Vector3f()
-    var m_position: Vector3f = Vector3f()
+    var m_color = Vec3()
+    var m_position = Vec3()
 }
 
 class VMDShadow {
