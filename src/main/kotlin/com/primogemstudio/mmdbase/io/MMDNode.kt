@@ -100,7 +100,7 @@ abstract class MMDNode {
         OnBeginUpdateTransform()
     }
     fun EndUpdateTransform() = OnEndUpdateTransform()
-    fun UpdateLocalTramsform() = OnUpdateLocalTransform()
+    fun UpdateLocalTransform() = OnUpdateLocalTransform()
     fun UpdateGlobalTransform() {
         m_global = if (m_parent == null) m_local
         else m_parent!!.m_global * m_local
