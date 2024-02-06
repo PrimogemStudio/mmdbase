@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'io.github.primogemstudio'
-version = '0.0.2-alpha1'
+version = '0.0.3'
 
 repositories {
     maven { url = 'https://raw.githubusercontent.com/kotlin-graphics/mary/master' }
