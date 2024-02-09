@@ -32,11 +32,25 @@ def plot_cube_crystal():
     ax = fig.add_subplot(1, 1, 1, projection='3d')#位置
     kwargs= {'alpha': 1, 'color': 'orange'}#上色
 
+    xr = []
+    yr = []
+    zr = []
     a = 0
-    for i in vtx[:10000]:
-        Thread(target=lambda: ax.plot3D([ar[i[0]][0], ar[i[1]][0], ar[i[2]][0]], [ar[i[0]][1], ar[i[1]][1], ar[i[2]][1]], [ar[i[0]][2], ar[i[1]][2], ar[i[2]][2]], **kwargs)).start()
+    def gt(a, b):
+        return ar[a][b]
+    for i in vtx[:-2]:
+        xr.append(gt(i[0], 0))
+        xr.append(gt(i[1], 0))
+        xr.append(gt(i[2], 0))
+        yr.append(gt(i[0], 1))
+        yr.append(gt(i[1], 1))
+        yr.append(gt(i[2], 1))
+        zr.append(gt(i[0], 2))
+        zr.append(gt(i[1], 2))
+        zr.append(gt(i[2], 2))
         a += 1
         print(a, i)
+    ax.plot3D(xr, yr, zr, **kwargs)
 
     plt.title("Tetrahedron")
     plt.show()
