@@ -1,6 +1,9 @@
 package com.primogemstudio.mmdbase
 
 import com.primogemstudio.mmdbase.io.ModelDataInputStream
+import glm_.glm
+import glm_.mat4x4.Mat4
+import glm_.quat.Quat
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray
 import org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays
@@ -27,7 +30,7 @@ const val fragmentShaderSource: String = "#version 330 core\n"+
 "{\n"+
 "   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"+
 "}\n"
-
+var rt_mat = Mat4()
 fun main() {
     val inp = ModelDataInputStream(Files.newInputStream(Paths.get("E:/mmd/lumine/lumine.pmx")))
     val data = inp.readPMXFile()
@@ -59,6 +62,12 @@ fun main() {
 
     glfwMakeContextCurrent(window)
     glfwSetFramebufferSizeCallback(window) { _, width, height -> glViewport(0, 0, width, height) }
+
+    glfwSetCursorPosCallback(window) {_, x, y ->
+        val warr = IntArray(1)
+        glfwGetWindowSize(window, warr, IntArray(1))
+        rt_mat = Mat4().rotateY((x / warr[0].toFloat() * 4f).toFloat(), Mat4())
+    }
 
     GL.createCapabilities()
 
@@ -100,7 +109,7 @@ fun main() {
         0, 1, 3,
         1, 2, 3
     )*/
-    val vertices01 = data.m_vertices.map { it.m_position }.flatMap { listOf(it.x, it.y, it.z) }.toFloatArray()
+    var vertices01 = data.m_vertices.map { it.m_position }.flatMap { listOf(it.x, it.y, it.z) }.toFloatArray()
     val indices = data.m_faces.map { it.m_vertices }.flatMap { listOf(it[0], it[1], it[1], it[2], it[2], it[0]) }.toIntArray()
     val VAOs = glGenVertexArrays()
     val VBOs = glGenBuffers()
@@ -115,12 +124,17 @@ fun main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * 4, 0)
     glEnableVertexAttribArray(0)
 
-    glfwSwapInterval(1)
+    glfwSwapInterval(0)
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0f, 0f, 0f, 0f)
         glClear(GL_COLOR_BUFFER_BIT)
 
+        vertices01 = data.m_vertices
+            .map { it.m_position * 0.08f }
+            .map { glm.rotate(rt_mat.toQuat(), it) }
+            .flatMap { listOf(it.x, it.y, it.z) }.toFloatArray()
         GL15.glBufferData(GL_ARRAY_BUFFER, vertices01, GL_STATIC_DRAW)
+
         glUseProgram(shaderProgram)
         glBindVertexArray(VAOs)
         GL11.glDrawElements(GL_LINES, indices.size, GL_UNSIGNED_INT, 0)
