@@ -65,8 +65,10 @@ fun main() {
 
     glfwSetCursorPosCallback(window) {_, x, y ->
         val warr = IntArray(1)
-        glfwGetWindowSize(window, warr, IntArray(1))
-        rt_mat = Mat4().rotateY((x / warr[0].toFloat() * 4f).toFloat(), Mat4())
+        val harr = IntArray(1)
+        glfwGetWindowSize(window, warr, harr)
+        rt_mat = Mat4().rotateY((x / warr[0].toFloat() * 2f).toFloat() - 1f, Mat4())
+            .rotateX((y / harr[0].toFloat() * 2f).toFloat() - 1f, Mat4())
     }
 
     GL.createCapabilities()
