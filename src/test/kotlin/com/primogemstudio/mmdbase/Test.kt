@@ -4,6 +4,7 @@ import com.primogemstudio.mmdbase.io.ModelDataInputStream
 import glm_.glm
 import glm_.mat4x4.Mat4
 import glm_.quat.Quat
+import glm_.vec3.Vec3
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray
 import org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays
@@ -38,22 +39,12 @@ fun main() {
 
     System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll")
 
-    /*val ps = PrintStream(File("vtx.dmp"))
-    data.m_vertices.forEach {
-        ps.println("[${it.m_position.x}, ${it.m_position.y}, ${it.m_position.z}]")
-    }
-
-    val ps2 = PrintStream(File("faces.dmp"))
-    data.m_faces.forEach {
-        ps2.println("[${it.m_vertices[0]}, ${it.m_vertices[1]}, ${it.m_vertices[2]}]")
-    }*/
-
     glfwInit()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE)
 
-    val window = glfwCreateWindow(800, 600, "Hello OpenGL!", NULL, NULL)
+    val window = glfwCreateWindow(800, 800, "Hello OpenGL!", NULL, NULL)
     if (window == NULL) {
         println("failed to create window")
         glfwTerminate()
@@ -67,8 +58,8 @@ fun main() {
         val warr = IntArray(1)
         val harr = IntArray(1)
         glfwGetWindowSize(window, warr, harr)
-        rt_mat = Mat4().rotateY((x / warr[0].toFloat() * 2f).toFloat() - 1f, Mat4())
-            .rotateX((y / harr[0].toFloat() * 2f).toFloat() - 1f, Mat4())
+        rt_mat = Mat4().rotateY((x / warr[0].toFloat() * 4f).toFloat(), Mat4())
+            .rotateX((y / harr[0].toFloat() * 4f).toFloat() - 2f, Mat4())
     }
 
     GL.createCapabilities()
@@ -101,16 +92,6 @@ fun main() {
     glDeleteShader(fragShader)
     glDeleteShader(vertexShader)
 
-    /*val vertices01 = floatArrayOf(
-        0.1f, 0.9f, 0.0f,
-        0.9f, 0.9f, 0.0f,
-        0.9f, 0.1f, 0.0f,
-        0.1f, 0.1f, 0.0f
-    )
-    val indices = intArrayOf(
-        0, 1, 3,
-        1, 2, 3
-    )*/
     var vertices01 = data.m_vertices.map { it.m_position }.flatMap { listOf(it.x, it.y, it.z) }.toFloatArray()
     val indices = data.m_faces.map { it.m_vertices }.flatMap { listOf(it[0], it[1], it[1], it[2], it[2], it[0]) }.toIntArray()
     val VAOs = glGenVertexArrays()
@@ -133,6 +114,7 @@ fun main() {
 
         vertices01 = data.m_vertices
             .map { it.m_position * 0.08f }
+            .map { it - Vec3(0f, 0.5f, 0f) }
             .map { glm.rotate(rt_mat.toQuat(), it) }
             .flatMap { listOf(it.x, it.y, it.z) }.toFloatArray()
         GL15.glBufferData(GL_ARRAY_BUFFER, vertices01, GL_STATIC_DRAW)
