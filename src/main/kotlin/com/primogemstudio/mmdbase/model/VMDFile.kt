@@ -1,4 +1,4 @@
-package com.primogemstudio.mmdbase.io
+package com.primogemstudio.mmdbase.model
 
 import glm_.quat.Quat
 import glm_.vec3.Vec3

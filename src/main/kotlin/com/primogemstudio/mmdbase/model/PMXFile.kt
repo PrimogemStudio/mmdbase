@@ -1,4 +1,4 @@
-package com.primogemstudio.mmdbase.io
+package com.primogemstudio.mmdbase.model
 
 import com.primogemstudio.mmdbase.abstraction.ITextureManager
 import glm_.quat.Quat

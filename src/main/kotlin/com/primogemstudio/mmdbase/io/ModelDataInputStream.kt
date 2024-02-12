@@ -1,5 +1,6 @@
 package com.primogemstudio.mmdbase.io
 
+import com.primogemstudio.mmdbase.model.*
 import glm_.quat.Quat
 import glm_.vec2.Vec2
 import glm_.vec3.Vec3
