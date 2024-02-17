@@ -1,11 +1,13 @@
 package com.primogemstudio.mmdbase.model
 
-class MMDMorph {
+import com.primogemstudio.mmdbase.abstraction.IMMDObject
+
+class MMDMorph: IMMDObject {
     var m_name: String = ""
     var m_weight: Float = 0f
     var m_saveAnimWeight: Float = 0f
         private set
-    fun saveBaseAnimation() { m_saveAnimWeight = m_weight }
-    fun loadBaseAnimation() { m_weight = m_saveAnimWeight }
-    fun clearBaseAnimation() { m_saveAnimWeight = 0f }
+    override fun SaveBaseAnimation() { m_saveAnimWeight = m_weight }
+    override fun LoadBaseAnimation() { m_weight = m_saveAnimWeight }
+    override fun ClearBaseAnimation() { m_saveAnimWeight = 0f }
 }

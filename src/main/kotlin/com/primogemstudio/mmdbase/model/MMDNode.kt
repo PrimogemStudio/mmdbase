@@ -1,11 +1,12 @@
 package com.primogemstudio.mmdbase.model
 
+import com.primogemstudio.mmdbase.abstraction.IMMDObject
 import glm_.glm
 import glm_.vec3.Vec3
 import glm_.quat.Quat
 import glm_.mat4x4.Mat4
 
-class MMDNode {
+class MMDNode: IMMDObject {
     var m_index: UInt = 0u
     var m_name: String = ""
     var m_enableIK: Boolean = false
@@ -122,17 +123,17 @@ class MMDNode {
         m_scale = m_initScale
     }
 
-    fun SaveBaseAnimation() {
+    override fun SaveBaseAnimation() {
         m_baseAnimTranslate = m_animTranslate
         m_baseAnimRotate = m_animRotate
     }
 
-    fun LoadBaseAnimation() {
+    override fun LoadBaseAnimation() {
         m_animTranslate = m_baseAnimTranslate
         m_animRotate = m_baseAnimRotate
     }
 
-    fun ClearBaseAnimation() {
+    override fun ClearBaseAnimation() {
         m_baseAnimTranslate = Vec3()
         m_baseAnimRotate = Quat(1f, 0f, 0f, 0f)
     }
